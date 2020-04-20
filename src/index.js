@@ -1,6 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
+// 引入公共样式
+import './index.css';
+import 'antd-mobile/dist/antd-mobile.css';
 import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(

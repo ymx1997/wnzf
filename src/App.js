@@ -1,9 +1,10 @@
 import React from 'react';
 
+import { Button,WhiteSpace } from 'antd-mobile';
 function App() {
   return (
     <div className="App">
-      app10086
+      <Button type="primary">按钮demo</Button><WhiteSpace />
     </div>
   );
 }
