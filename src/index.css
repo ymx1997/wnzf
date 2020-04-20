@@ -24,3 +24,8 @@ ul,li {
     /* // touch-action: none;  */
     box-sizing: border-box; 
 }
+
+.app a, .home a {
+    display: inline-block;
+    margin: 10px;
+}
