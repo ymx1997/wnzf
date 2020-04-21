@@ -10,6 +10,7 @@ export default class Index extends Component {
     state = {
         swiper: [],
         imgHeight: 176,
+        isPlay: false,
       }
       componentDidMount() {
           this.getSwiper()
@@ -22,6 +23,11 @@ export default class Index extends Component {
     if (status === 200) {
         this.setState({
             swiper: data
+        },()=>{
+            // 确保swiper有数据=>this.state.swiper
+            this.setState({
+                isPlay: true
+            })
         })
     }
     }
@@ -31,7 +37,8 @@ export default class Index extends Component {
           <div className="index">
               {/* 轮播图 */}
             <Carousel
-              autoplay={true}
+              autoplay={this.state.isPlay}
+              autoplayInterval={2000}
               infinite
             >
               {this.state.swiper.map(val => (
