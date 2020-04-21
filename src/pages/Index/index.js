@@ -3,8 +3,9 @@
  */
 import React, { Component } from 'react'
 import { Carousel } from 'antd-mobile';
+import { BASE_URL } from '../../utils/axios';
+import { getSwiper } from '../../utils/api/Home';
 
-import axios from 'axios';
 export default class Index extends Component {
     state = {
         swiper: [],
@@ -16,14 +17,11 @@ export default class Index extends Component {
 
     //   获取轮播图数据
     getSwiper= async ()=>{
-    const res = await axios.get('http://api-haoke-dev.itheima.net/home/swiper');
-    if (res.status === 200) {
-        // 处理图片路径
-        // res.data.body.forEach((item)=>{
-        //     item.imgSrc = `http://api-haoke-dev.itheima.net${item.imgSrc}`
-        // })
+    const {status, data} = await getSwiper();
+    // console.log('page', res);
+    if (status === 200) {
         this.setState({
-            swiper:res.data.body
+            swiper: data
         })
     }
     }
@@ -43,7 +41,7 @@ export default class Index extends Component {
                   style={{ display: 'inline-block', width: '100%', height: this.state.imgHeight }}
                 >
                   <img
-                    src={`http://api-haoke-dev.itheima.net${val.imgSrc}`}
+                    src={`${BASE_URL}${val.imgSrc}`}
                     alt=""
                     style={{ width: '100%', verticalAlign: 'top' }}
                     onLoad={() => {
