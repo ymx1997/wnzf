@@ -19,6 +19,17 @@ class Home extends Component {
         selectedTab: this.props.location.pathname
     };
 
+    componentDidMount() {
+        // 监听路由变化
+        this.props.history.listen((location) => {
+            if(location.pathname !== this.state.selectedTab) {
+                this.setState({
+                    selectedTab: location.pathname
+                });
+            }
+        })
+    }
+
     renderTabBar = () => {
         return (
             <TabBar
@@ -37,9 +48,9 @@ class Home extends Component {
                         selected={this.state.selectedTab === item.path}
                         onPress={() => {
                             this.props.history.push(item.path);
-                            this.setState({
-                                selectedTab: item.path,
-                            });
+                            // this.setState({
+                            //     selectedTab: item.path,
+                            // });
                         }}
                     />)
                 }
