@@ -5,9 +5,9 @@
  * 默认首页
  */
 import React, { Component } from 'react'
-import { Carousel, Flex, Grid } from 'antd-mobile';
+import { Carousel, Flex, Grid, WingBlank } from 'antd-mobile';
 import { BASE_URL } from '../../utils/axios';
-import { getSwiper, getGroups } from '../../utils/api/Home';
+import { getSwiper, getGroups, getNews } from '../../utils/api/Home';
 import './index.scss';
 import Navs from '../../utils/navConfig';
 
@@ -16,12 +16,14 @@ export default class Index extends Component {
     state = {
         swiper: [],
         groups: [],
+        news: [],
         imgHeight: 176,
         isPlay: false,
     }
     componentDidMount() {
         this.getSwiper()
         this.getGroups()
+        this.getNews()
     }
 
     //   获取轮播图数据
@@ -46,6 +48,16 @@ export default class Index extends Component {
         if (status === 200) {
             this.setState({
                 groups: data
+            })
+        }
+    }
+
+    // 获取资讯列表的数据
+    getNews = async () => {
+        let { status, data } = await getNews();
+        if (status === 200) {
+            this.setState({
+                news: data
             })
         }
     }
@@ -102,30 +114,52 @@ export default class Index extends Component {
     renderGroup = () => {
         return (
             <>
-            <Flex className="group-title" justify="between">
-                <h3>租房小组</h3>
-                <span>更多</span>
-            </Flex>
-            <Grid data={this.state.groups}
-                columnNum={2}
-                hasLine={false}
-                square={false}
-                renderItem={item => {
-                    return (
-                        //  item结构 
-                        <Flex key={item.id} className="grid-item" justify="between">
-                            <div className="desc">
-                                <h3>{item.title}</h3>
-                                <p>{item.desc}</p>
-                            </div>
-                            <img src={`${BASE_URL}${item.imgSrc}`} alt="" />
-                        </Flex>
-                    )
-                }
-                }
-            />
+                <Flex className="group-title" justify="between">
+                    <h3>租房小组</h3>
+                    <span>更多</span>
+                </Flex>
+                <Grid data={this.state.groups}
+                    columnNum={2}
+                    hasLine={false}
+                    square={false}
+                    renderItem={item => {
+                        return (
+                            //  item结构 
+                            <Flex key={item.id} className="grid-item" justify="between">
+                                <div className="desc">
+                                    <h3>{item.title}</h3>
+                                    <p>{item.desc}</p>
+                                </div>
+                                <img src={`${BASE_URL}${item.imgSrc}`} alt="" />
+                            </Flex>
+                        )
+                    }
+                    }
+                />
             </>
         )
+    }
+
+    // 渲染最新资讯
+    renderNews() {
+        return this.state.news.map(item => (
+            <div className="news-item" key={item.id}>
+                <div className="imgwrap">
+                    <img
+                        className="img"
+                        src={`${ BASE_URL }${item.imgSrc}`}
+                        alt=""
+                    />
+                </div>
+                <Flex className="content" direction="column" justify="between">
+                    <h3 className="title">{item.title}</h3>
+                    <Flex className="info" justify="between">
+                        <span>{item.from}</span>
+                        <span>{item.date}</span>
+                    </Flex>
+                </Flex>
+            </div>
+        ))
     }
 
     render() {
@@ -143,9 +177,15 @@ export default class Index extends Component {
 
                 {/* 租房小组 */}
                 <div className="group">
-                {
-                    this.renderGroup()
-                }
+                    {
+                        this.renderGroup()
+                    }
+                </div>
+
+                {/* 最新资讯 */}
+                <div className="news">
+                <h3 className="group-title">最新资讯</h3>
+                <WingBlank size="md">{this.renderNews()}</WingBlank>
                 </div>
             </div>
         );
