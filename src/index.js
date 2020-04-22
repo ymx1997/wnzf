@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
 // 引入公共样式
-import './index.css';
+import './index.scss';
 // 字体图标库的样式
 import './assets/fonts/iconfont.css'
 import * as serviceWorker from './serviceWorker';
