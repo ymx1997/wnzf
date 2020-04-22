@@ -21,44 +21,27 @@ export default class Index extends Component {
         isPlay: false,
     }
     componentDidMount() {
-        this.getSwiper()
-        this.getGroups()
-        this.getNews()
+        this.getAllDatas()
     }
 
-    //   获取轮播图数据
-    getSwiper = async () => {
-        const { status, data } = await getSwiper();
-        // console.log('page', res);
-        if (status === 200) {
-            this.setState({
-                swiper: data
-            }, () => {
-                // 确保swiper有数据=>this.state.swiper
+
+    // 获取首页所有接口数据
+    getAllDatas = async () => {
+        try {
+            let [swiper, groups, news] = await Promise.all([getSwiper(), getGroups(), getNews()]);
+            if (swiper.status === 200 && groups.status === 200 && news.status === 200) {
                 this.setState({
-                    isPlay: true
+                    swiper: swiper.data,
+                    groups: groups.data,
+                    news: news.data
+                }, () => {
+                    this.setState({
+                        isPlay: true
+                    })
                 })
-            })
-        }
-    }
-
-    // 获取租房小组数据
-    getGroups = async () => {
-        let { status, data } = await getGroups();
-        if (status === 200) {
-            this.setState({
-                groups: data
-            })
-        }
-    }
-
-    // 获取资讯列表的数据
-    getNews = async () => {
-        let { status, data } = await getNews();
-        if (status === 200) {
-            this.setState({
-                news: data
-            })
+            }
+        } catch (error) {
+            console.log(error);
         }
     }
 
@@ -147,7 +130,7 @@ export default class Index extends Component {
                 <div className="imgwrap">
                     <img
                         className="img"
-                        src={`${ BASE_URL }${item.imgSrc}`}
+                        src={`${BASE_URL}${item.imgSrc}`}
                         alt=""
                     />
                 </div>
@@ -184,8 +167,8 @@ export default class Index extends Component {
 
                 {/* 最新资讯 */}
                 <div className="news">
-                <h3 className="group-title">最新资讯</h3>
-                <WingBlank size="md">{this.renderNews()}</WingBlank>
+                    <h3 className="group-title">最新资讯</h3>
+                    <WingBlank size="md">{this.renderNews()}</WingBlank>
                 </div>
             </div>
         );
