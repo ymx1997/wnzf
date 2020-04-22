@@ -15,6 +15,7 @@ class Map extends Component {
     // 初始化地图
     initMap = () => {
         const { BMap } = window;
+        // 打断点
         // console.log(BMap);
         // 创建地图实例
         const map = new BMap.Map("container");
