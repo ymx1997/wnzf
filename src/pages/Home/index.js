@@ -20,14 +20,24 @@ class Home extends Component {
     };
 
     componentDidMount() {
+        this.listenRouter()
+    }
+
+    listenRouter = () => {
         // 监听路由变化
-        this.props.history.listen((location) => {
-            if(location.pathname !== this.state.selectedTab) {
+        this.unlisten = this.props.history.listen((location) => {
+            if (location.pathname !== this.state.selectedTab) {
                 this.setState({
                     selectedTab: location.pathname
                 });
             }
         })
+    }
+
+    // 组件销毁
+    componentWillUnmount() {
+        // 销毁路由监听事件
+        this.unlisten()
     }
 
     renderTabBar = () => {

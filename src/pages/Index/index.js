@@ -5,7 +5,7 @@
  * 默认首页
  */
 import React, { Component } from 'react'
-import { Carousel, Flex, Grid, WingBlank } from 'antd-mobile';
+import { Carousel, Flex, Grid, WingBlank, SearchBar } from 'antd-mobile';
 import { BASE_URL } from '../../utils/axios';
 import { getSwiper, getGroups, getNews } from '../../utils/api/Home';
 import './index.scss';
@@ -14,10 +14,17 @@ import Navs from '../../utils/navConfig';
 
 export default class Index extends Component {
     state = {
+        // 轮播图数据
         swiper: [],
+        // 租房小组数据
         groups: [],
+        // 资讯列表数据
         news: [],
+        // 头部搜索关键词
+        keyword:'',
+        // 设置轮播图默认高度
         imgHeight: 176,
+        // 是否自动播放
         isPlay: false,
     }
     componentDidMount() {
@@ -43,6 +50,33 @@ export default class Index extends Component {
         } catch (error) {
             console.log(error);
         }
+    }
+
+    // 渲染顶部导航
+    renderTopNav = () => {
+        const {push} = this.props.history
+        return (
+            <Flex justify="around" className="topNav">
+                <div className="searchBox">
+                    <div className="city" onClick={()=>{
+                    push('/cityList')
+                    }}>
+                        北京<i className="iconfont icon-arrow" />
+                    </div>
+                    <SearchBar
+                    // 受控组件 (双向绑定)
+                        value={this.state.keyword}
+                        onChange={(v) => this.setState({ keyword: v })}
+                        placeholder="请输入小区或地址"
+                    />
+                </div>
+                <div className="map" onClick={()=>{
+                    push('/map')
+                }}>
+                    <i key="0" className="iconfont icon-map" />
+                </div>
+            </Flex>
+        )
     }
 
     // 渲染轮播图
@@ -148,6 +182,10 @@ export default class Index extends Component {
     render() {
         return (
             <div className="index">
+                {/* 头部搜索 */}
+                {
+                    this.renderTopNav()
+                }
                 {/* 轮播图 */}
                 {
                     this.renderSwiper()
