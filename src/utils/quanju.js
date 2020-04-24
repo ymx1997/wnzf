@@ -3,9 +3,26 @@
  */
 import { getCityInfo } from './api/City';
 
+const CURR_CITY = 'curr_city';
+// 封装本地存储方法
+// 存储本地数据
+export function setLocal(key,val) {
+    localStorage.setItem(key,val)
+}
+
+// 获取本地数据
+export function getLocal(key) {
+    return localStorage.getItem(key)
+}
+
+// 删除本地数据
+export function delLocal(key) {
+    return localStorage.removeItem(key)
+}
+
 // 返回Promise =》 外边调用者可通过async和await方式获取resolve的数据
 // 城市信息存储到本地=》localStorage
-const CURR_CITY = 'curr_city';
+
 
 // 根据百度地图API获取定位城市名字
 const getCityName = async () => {
@@ -18,7 +35,7 @@ const getCityName = async () => {
 }
 export async function getCurCity() {
     // 先从本地获取之前保存过的城市定位信息
-    let curCity = JSON.parse(localStorage.getItem('CURR_CITY'))
+    let curCity = JSON.parse(getLocal('CURR_CITY'))
     // 获取到城市名字=》作比对
     let res = await getCityName()
     let realName = res.substr(0, 3)
@@ -31,7 +48,7 @@ export async function getCurCity() {
             // alert("当前定位城市:"+myCity);
             if (status === 200) {
                 // 存储到本地
-                localStorage.setItem(CURR_CITY, JSON.stringify(data))
+                setLocal(CURR_CITY, JSON.stringify(data))
                 // 传递数据
                 resolve(data)
             } else {
