@@ -12,3 +12,17 @@ export function getCityInfo(name) {
         }
     })
 }
+
+//  根据城市列表数据
+export function getCityList(level=1) {
+    return api.get('/area/city',{
+        params:{
+            level
+        }
+    })
+}
+
+//  获取热门城市
+export function getHotCity() {
+    return api.get('/area/hot')
+}

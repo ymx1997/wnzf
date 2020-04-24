@@ -44,9 +44,11 @@ export default class Index extends Component {
     getCurCity = () => {
         // 根据IP定位当前城市的类LocalCity(构造函数)
         let myCity = new window.BMap.LocalCity();
-        myCity.get(async (result)=>{
+        
+        myCity.get(async (res)=>{
             // 调用接口获取城市详细信息
-            const {status, data} = await getCityInfo(result.name)
+            const {status, data} = await getCityInfo(res.name)
+            // alert("当前定位城市:"+myCity);
             if(status === 200) {
                 this.setState({
                     curCity:data
