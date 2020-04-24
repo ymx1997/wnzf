@@ -10,6 +10,7 @@ import { BASE_URL } from '../../utils/axios';
 import { getSwiper, getGroups, getNews } from '../../utils/api/Home';
 import './index.scss';
 import Navs from '../../utils/navConfig';
+import { getCityInfo } from '../../utils/api/City';
 
 
 export default class Index extends Component {
@@ -20,8 +21,15 @@ export default class Index extends Component {
         groups: [],
         // 资讯列表数据
         news: [],
+        // 当前城市
+        curCity:{
+            // 城市名字
+            label:'--',
+            // 城市ID
+            value:''
+        },
         // 头部搜索关键词
-        keyword:'',
+        keyword: '',
         // 设置轮播图默认高度
         imgHeight: 176,
         // 是否自动播放
@@ -29,8 +37,23 @@ export default class Index extends Component {
     }
     componentDidMount() {
         this.getAllDatas()
+        this.getCurCity()
     }
 
+    // 根据百度地图获取当前定位城市
+    getCurCity = () => {
+        // 根据IP定位当前城市的类LocalCity(构造函数)
+        let myCity = new window.BMap.LocalCity();
+        myCity.get(async (result)=>{
+            // 调用接口获取城市详细信息
+            const {status, data} = await getCityInfo(result.name)
+            if(status === 200) {
+                this.setState({
+                    curCity:data
+                })
+            }
+        }); 
+    }
 
     // 获取首页所有接口数据
     getAllDatas = async () => {
@@ -54,23 +77,23 @@ export default class Index extends Component {
 
     // 渲染顶部导航
     renderTopNav = () => {
-        const {push} = this.props.history
+        const { push } = this.props.history
         return (
             <Flex justify="around" className="topNav">
                 <div className="searchBox">
-                    <div className="city" onClick={()=>{
-                    push('/cityList')
+                    <div className="city" onClick={() => {
+                        push('/cityList')
                     }}>
-                        北京<i className="iconfont icon-arrow" />
+                        {this.state.curCity.label}<i className="iconfont icon-arrow" />
                     </div>
                     <SearchBar
-                    // 受控组件 (双向绑定)
+                        // 受控组件 (双向绑定)
                         value={this.state.keyword}
                         onChange={(v) => this.setState({ keyword: v })}
                         placeholder="请输入小区或地址"
                     />
                 </div>
-                <div className="map" onClick={()=>{
+                <div className="map" onClick={() => {
                     push('/map')
                 }}>
                     <i key="0" className="iconfont icon-map" />
