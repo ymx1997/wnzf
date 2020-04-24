@@ -10,8 +10,7 @@ import { BASE_URL } from '../../utils/axios';
 import { getSwiper, getGroups, getNews } from '../../utils/api/Home';
 import './index.scss';
 import Navs from '../../utils/navConfig';
-import { getCityInfo } from '../../utils/api/City';
-
+import { getCurCity } from '../../utils/quanju';
 
 export default class Index extends Component {
     state = {
@@ -38,23 +37,15 @@ export default class Index extends Component {
     componentDidMount() {
         this.getAllDatas()
         this.getCurCity()
+        // this.getCurCity()
     }
 
-    // 根据百度地图获取当前定位城市
-    getCurCity = () => {
-        // 根据IP定位当前城市的类LocalCity(构造函数)
-        let myCity = new window.BMap.LocalCity();
-        
-        myCity.get(async (res)=>{
-            // 调用接口获取城市详细信息
-            const {status, data} = await getCityInfo(res.name)
-            // alert("当前定位城市:"+myCity);
-            if(status === 200) {
-                this.setState({
-                    curCity:data
-                })
-            }
-        }); 
+
+    getCurCity = async () => {
+        const res = await getCurCity()
+        this.setState({
+            curCity: res
+        })
     }
 
     // 获取首页所有接口数据
