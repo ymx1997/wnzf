@@ -3,11 +3,11 @@
  */
 import React, { Component } from 'react'
 import { getCityList, getHotCity } from '../../utils/api/City'
-import { getCurCity } from '../../utils/quanju';
+import { getCurCity, setLocal, CURR_CITY } from '../../utils/quanju';
 
 import { List, AutoSizer } from 'react-virtualized'
 import './index.scss'
-import { NavBar, Icon } from 'antd-mobile';
+import { NavBar, Icon, Toast } from 'antd-mobile';
 
 
 
@@ -38,6 +38,20 @@ class CityList extends Component {
         }
     }
 
+    // 切换城市
+    changeCity=(item)=>{
+        // 有数据
+        const hasData = ['北京','上海','广州','深圳'];
+        if(hasData.includes(item.label)) {
+            // 更新当前城市数据
+            setLocal(CURR_CITY, JSON.stringify(item));
+            // 跳转到首页
+            this.props.history.push('/')
+        } else {
+            Toast.info('该城市暂无房源数据！')
+        }
+    }
+
     rowRenderer = ({
         key,
         index,
@@ -58,7 +72,7 @@ class CityList extends Component {
             <div key={key} style={style} className="city-item">
                 <div className="title">{this.formatLetter(letter)}</div>
                 {
-                    item.map((item)=><div key={item.value} className="name">{item.label}</div>)
+                    item.map((item)=><div onClick={()=>this.changeCity(item)} key={item.value} className="name">{item.label}</div>)
                 }
             </div>
         )

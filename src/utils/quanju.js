@@ -35,11 +35,11 @@ const getCityName = async () => {
 }
 export async function getCurCity() {
     // 先从本地获取之前保存过的城市定位信息
-    let curCity = JSON.parse(getLocal('CURR_CITY'))
+    let curCity = JSON.parse(getLocal(CURR_CITY))
     // 获取到城市名字=》作比对
     let res = await getCityName()
-    let realName = res.substr(0, 3)
-    if (!curCity || realName !== curCity.label) {
+    let realName = res.substr(0, 2);
+    if (!curCity) {
         // 如果没有（第一次定位）
         // 获取定位信息 返回promise对象=》resolve结果
         return new Promise(async (resolve, reject) => {
@@ -60,3 +60,5 @@ export async function getCurCity() {
         return Promise.resolve(curCity)
     }
 }
+
+export { CURR_CITY }
