@@ -122,6 +122,16 @@ class CityList extends Component {
             cityIndex
         }
     }
+
+    // 动态计算高度
+    excueHeight=({index}) => {
+        const {cityIndex, cityList} = this.state;
+        // 计算公式：title高度50 + 当前归类的城市数量*36
+        let curKey = cityIndex[index]
+        // console.log(curKey);
+        return 36 + cityList[curKey].length*50
+    }
+
     render() {
         return (
             <div className="cityList">
@@ -137,7 +147,7 @@ class CityList extends Component {
                         <List
                             height={height}
                             rowCount={this.state.cityIndex.length}
-                            rowHeight={120}
+                            rowHeight={this.excueHeight}
                             rowRenderer={this.rowRenderer}
                             width={width}
                         />
