@@ -7,21 +7,21 @@ const CURR_CITY = 'curr_city';
 // 封装本地存储方法
 // 存储本地数据
 export function setLocal(key,val) {
-    localStorage.setItem(key,val)
+    sessionStorage.setItem(key,val)
 }
 
 // 获取本地数据
 export function getLocal(key) {
-    return localStorage.getItem(key)
+    return sessionStorage.getItem(key)
 }
 
 // 删除本地数据
 export function delLocal(key) {
-    return localStorage.removeItem(key)
+    return sessionStorage.removeItem(key)
 }
 
 // 返回Promise =》 外边调用者可通过async和await方式获取resolve的数据
-// 城市信息存储到本地=》localStorage
+// 城市信息存储到本地=》sessionStorage
 
 
 // 根据百度地图API获取定位城市名字

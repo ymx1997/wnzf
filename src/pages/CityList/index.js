@@ -10,15 +10,16 @@ import './index.scss'
 import { NavBar, Icon, Toast } from 'antd-mobile';
 
 
-
 class CityList extends Component {
 
     // 设置状态数据
     state = {
         // 归类的城市数据
-        cityList:{},
+        cityList: {},
         // 归类的城市索引
-        cityIndex:[]
+        cityIndex: [],
+        // 当前滚动到的行索引
+        activeIndex:0,
     }
 
     componentDidMount() {
@@ -26,23 +27,23 @@ class CityList extends Component {
     }
 
     // 格式化列表的title
-    formatLetter=(letter)=>{
+    formatLetter = (letter,isRight) => {
         switch (letter) {
             case '#':
-            return '当前城市';
+                return isRight?'当':'当前城市';
             case 'hot':
-            return '热门城市';
+                return isRight?'热':'热门城市';
             default:
                 // 处理成大写
-            return letter.toUpperCase()
+                return letter.toUpperCase()
         }
     }
 
     // 切换城市
-    changeCity=(item)=>{
+    changeCity = (item) => {
         // 有数据
-        const hasData = ['北京','上海','广州','深圳'];
-        if(hasData.includes(item.label)) {
+        const hasData = ['北京', '上海', '广州', '深圳'];
+        if (hasData.includes(item.label)) {
             // 更新当前城市数据
             setLocal(CURR_CITY, JSON.stringify(item));
             // 跳转到首页
@@ -60,7 +61,7 @@ class CityList extends Component {
         style,
     }) => {
         // 获取处理完的状态数据
-        const {cityList, cityIndex} = this.state;
+        const { cityList, cityIndex } = this.state;
         // 对象的键
         let letter = cityIndex[index];
         // console.log(index,letter);
@@ -72,7 +73,7 @@ class CityList extends Component {
             <div key={key} style={style} className="city-item">
                 <div className="title">{this.formatLetter(letter)}</div>
                 {
-                    item.map((item)=><div onClick={()=>this.changeCity(item)} key={item.value} className="name">{item.label}</div>)
+                    item.map((item) => <div onClick={() => this.changeCity(item)} key={item.value} className="name">{item.label}</div>)
                 }
             </div>
         )
@@ -138,14 +139,47 @@ class CityList extends Component {
     }
 
     // 动态计算高度
-    excueHeight=({index}) => {
-        const {cityIndex, cityList} = this.state;
+    excueHeight = ({ index }) => {
+        const { cityIndex, cityList } = this.state;
         // 计算公式：title高度50 + 当前归类的城市数量*36
         let curKey = cityIndex[index]
         // console.log(curKey);
-        return 36 + cityList[curKey].length*50
+        return 36 + cityList[curKey].length * 50
     }
 
+    // 渲染右侧索引
+    renderCityIndex = () => {
+        const { cityIndex, activeIndex } = this.state;
+        return cityIndex.map((item, index) => {
+            return (
+                <li
+                    key={item}
+                    className="city-index-item"
+                    onClick={() => {
+                        // console.log(this.listRef.scrollToRow);
+                        this.listRef.scrollToRow(index);
+                        // this.setState({
+                        //     activeIndex:index
+                        // })
+                    }}
+                >
+                    <span className={activeIndex === index ? 'index-active' : ''}>
+                        {this.formatLetter(item, true)}
+                    </span>
+                </li>
+            )
+        })
+    }
+
+    // 每次渲染完都会执行
+    onRowsRendered=({startIndex})=>{
+        if(this.state.activeIndex !== startIndex) {
+            this.setState({
+                activeIndex:startIndex
+            })
+        }
+        
+    }
     render() {
         return (
             <div className="cityList">
@@ -159,6 +193,9 @@ class CityList extends Component {
                 <AutoSizer>
                     {({ height, width }) => (
                         <List
+                            ref={(ele)=>this.listRef = ele}
+                            scrollToAlignment='start'
+                            onRowsRendered={this.onRowsRendered}
                             height={height}
                             rowCount={this.state.cityIndex.length}
                             rowHeight={this.excueHeight}
@@ -167,6 +204,10 @@ class CityList extends Component {
                         />
                     )}
                 </AutoSizer>
+                {/* 右侧索引列表 */}
+                <ul className="city-index">
+                    {this.renderCityIndex()}
+                </ul>
             </div>
         )
     }
