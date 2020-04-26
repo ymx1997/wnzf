@@ -90,7 +90,10 @@ export default class Filter extends Component {
         newStatus[key] = true
       } else if (key === 'price' && cur[0] !== 'null') {
         newStatus[key] = true
-      } else {
+      } else if (key === 'more' && cur.length > 0) {
+        newStatus[key] = true
+      }
+      else {
         newStatus[key] = false
       }
 
@@ -100,18 +103,45 @@ export default class Filter extends Component {
 
   }
 
+  // 处理所有筛选器数据 => 后台需要的格式
+  formatFilters = (selDatas) => {
+    // 获取存储的筛选条件数据
+    const { area, mode, price, more } = selDatas;
+    // 组装数据
+    const filters = {};
+    // 区域下边：区域 | 地铁
+    let areaKey = area[0], aval;
+    if (area.length === 2) {
+      aval = area[1]
+    } else {
+      if (area[2] === 'null') {
+        aval = area[1]
+      } else {
+        aval = area[2]
+      }
+    }
+    filters[areaKey] = aval;
+    // 出租方式 价格
+    filters.rentType = mode[0]
+    filters.price = price[0]
+    // 更多
+    filters.more = more.join(',')
+    return filters
+  }
+
   // 点击确定的时候执行
   onOk = (curSel) => {
-    console.log('picker当前选中的值：', curSel)
     // 存储到组件this（实例）
     const { openType } = this.state;
     this.selectedValues[openType] = curSel;
-
-
+    console.log('当前选中的过滤条件：', curSel, this.selectedValues);
+    
     this.setState({
       openType: '',
       // 处理高亮状态
       titleSelectedStatus: this.handlerSel()
+    }, () => {
+      this.props.onFilter(this.formatFilters(this.selectedValues))
     })
   }
 
@@ -157,15 +187,15 @@ export default class Filter extends Component {
     const { openType } = this.state;
     if (openType === 'more') {
       // 传递后台过滤条件的数据
-      console.log(this.filterDatas);
+      // console.log(this.filterDatas);
       const { oriented, floor, roomType, characteristic } = this.filterDatas;
       let data = { oriented, floor, roomType, characteristic };
       return (
         <FilterMore
           data={data}
+          value={this.selectedValues[openType]}
           onOk={this.onOk}
           onCancle={this.onCancle}
-
         />
       )
     }
