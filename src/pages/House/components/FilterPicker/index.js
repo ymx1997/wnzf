@@ -4,6 +4,7 @@ import { PickerView } from 'antd-mobile'
 
 import FilterFooter from '../../../../components/FilterFooter'
 
+// treeView(树)
 const province = [
   {
     label: '北京',
@@ -87,15 +88,42 @@ const province = [
   }
 ]
 
+// 共用一个组件
 export default class FilterPicker extends Component {
+
+  // // 只执行一次
+  // constructor(props) {
+  //   super(props)
+  //   console.log('子组件picker=>constructor', this.props.value)
+  // }
+
+
+  // 它是什么时机执行？执行几次？
+  // 在组件实例的时候执行，1次
+  state = {
+    // picker当前选中的数据
+    value: this.props.value
+  }
+
+
   render() {
+    const { data, cols } = this.props;
     return (
       <>
         {/* 选择器组件： */}
-        <PickerView data={province} value={null} cols={3} />
+        <PickerView data={data}
+          value={this.state.value}
+          onChange={(v) => {
+            this.setState({
+              value: v
+            })
+          }}
+          cols={cols} />
 
         {/* 底部按钮 */}
-        <FilterFooter onOk={this.props.onOk} onCancle={this.props.onCancle}/>
+        <FilterFooter onOk={() => {
+          this.props.onOk(this.state.value)
+        }} onCancle={this.props.onCancle} />
       </>
     )
   }
