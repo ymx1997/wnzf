@@ -26,9 +26,10 @@ export function getListByFilter(cityId, filters, start, end) {
     })
 }
 
-
-
-
+// 根据房源ID获取房源详情
+export function getDetailById(id) {
+    return api.get(`/houses/${id}`)
+}
 
 
 

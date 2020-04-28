@@ -133,7 +133,7 @@ export default class Index extends Component {
                 {
                     Navs.map((item) => <Flex.Item onClick={
                         () => {
-                            this.props.history.push(item.path)
+                            this.props.history.push({ pathname: item.path }, { a: 10, b: '123' })
                         }
                     } key={item.id}>
                         <img src={item.img} />

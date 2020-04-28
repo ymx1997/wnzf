@@ -28,6 +28,9 @@ class Map extends Component {
     render() {
         return (
             <div className="xBai">
+                <p onClick={() => {
+                    console.log(this.props);
+                }}>获取参互说</p>
                 {/* 导航栏 */}
                 <NavBar
                     mode="dark"
