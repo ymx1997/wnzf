@@ -1,3 +1,4 @@
+/* eslint-disable default-case */
 import React, { Component } from 'react'
 
 // 过滤器的头
