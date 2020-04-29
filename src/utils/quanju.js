@@ -3,7 +3,7 @@
  */
 import { getCityInfo } from './api/City';
 
-const CURR_CITY = 'curr_city';
+const CURR_CITY = 'curr_city', WNZF_TOKEN = 'WNZF_TOKEN';
 // 封装本地存储方法
 // 存储本地数据
 export function setLocal(key,val) {
@@ -61,4 +61,4 @@ export async function getCurCity() {
     }
 }
 
-export { CURR_CITY }
+export { CURR_CITY, WNZF_TOKEN }
