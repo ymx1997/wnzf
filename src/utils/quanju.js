@@ -20,6 +20,25 @@ export function delLocal(key) {
     return sessionStorage.removeItem(key)
 }
 
+// 封装持久化token相关方法
+// 设置token
+export function setToken(token) {
+    setLocal(WNZF_TOKEN, token)
+}
+
+// 删除token
+export function delToken() {
+    delLocal(WNZF_TOKEN)
+}
+
+// 获取token
+export function getToken() {
+    return getLocal(WNZF_TOKEN)
+}
+
+// 是否登录（鉴权）
+const isAuth = () => !!getToken();
+
 // 返回Promise =》 外边调用者可通过async和await方式获取resolve的数据
 // 城市信息存储到本地=》sessionStorage
 
@@ -61,4 +80,4 @@ export async function getCurCity() {
     }
 }
 
-export { CURR_CITY, WNZF_TOKEN }
+export { CURR_CITY, WNZF_TOKEN, isAuth }
