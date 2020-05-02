@@ -24,6 +24,8 @@ class Login extends Component {
       handleBlur,
       handleSubmit,
     } = this.props;
+    console.log(this.props);
+    
     return (
       <div className={styles.root}>
         {/* 顶部导航 */}
@@ -83,7 +85,7 @@ const NewLogin = withFormik({
     username: yup.string().required('用户名必填！').matches(REG_UNAME, '长度为5到8位，只能出现数字、字母、下划线'),
     password: yup.string().required('密码必填！').matches(REG_PWD, '长度为5到12位，只能出现数字、字母、下划线'),
   }),
-  handleSubmit: async (values, { props: { history } }) => {
+  handleSubmit: async (values, { props: { history, location } }) => {
     // 获取用户名和密码
     const { username, password } = values;
     const { status, data, description } = await login({ username, password });
@@ -92,7 +94,15 @@ const NewLogin = withFormik({
       // 存储token
       setLocal(WNZF_TOKEN, data.token);
       // 跳转页面
-      history.push('/home/profile')
+      // 判断是否有回跳地址
+      // if(location.data && location.data.backUrl) {
+        // ?. 等价于上边写法
+      if(location.data?.backUrl) {
+        history.push(location.data.backUrl)
+      } else {
+        history.push('/home/profile')
+      }
+      
     } else {
       Toast.fail(description, 2)
     }

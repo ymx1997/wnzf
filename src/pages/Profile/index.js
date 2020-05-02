@@ -1,11 +1,13 @@
 import React, { Component } from 'react'
 
 import { Link } from 'react-router-dom'
-import { Grid, Button } from 'antd-mobile'
+import { Grid, Button, Modal, Toast } from 'antd-mobile'
 
 import { BASE_URL } from '../../utils/axios'
 
 import styles from './index.module.css'
+import { isAuth, delToken } from '../../utils/quanju'
+import { getUserData, logout } from '../../utils/api/user'
 
 // 菜单数据
 const menus = [
@@ -25,8 +27,67 @@ const menus = [
 const DEFAULT_AVATAR = BASE_URL + '/img/profile/avatar.png'
 
 export default class Profile extends Component {
+
+  // 设置状态数据
+  state = {
+    // 是否登录
+    isLogin: isAuth(),
+    userInfo: {}
+  }
+
+  componentDidMount() {
+    this.getUserInfo()
+  }
+
+  // 判断用户是否登录 => 登录 => 调用接口获取用户信息
+  getUserInfo = async () => {
+    const { isLogin, userInfo } = this.state;
+    // 登录 => 调用接口获取用户信息
+    if (isLogin) {
+      let { status, data } = await getUserData();
+      if (status === 200) {
+        // 当前登录人的图片地址
+        if (data.avatar) {
+          data.avatar = `${BASE_URL}$(data.avatar)`
+        }
+        this.setState({
+          userInfo: data
+        })
+      }
+    } else {
+      // token过期处理
+    }
+  }
+
+  // 登出
+  logout = () => {
+    // 给用户一个确认 =》 是否退出登录？
+    Modal.alert('提示', '确定是否退出登录???', [
+      { text: '取消' },
+      {
+        text: '确定', onPress: async () => {
+          // 退出的逻辑 => 登出接口
+          let { status, description } = await logout();
+          if (status === 200) {
+            // 后端退出成功了
+            Toast.info(description, 2);
+            // 本地token删除 => 前端
+            delToken()
+            // 跳到登录
+            // this.props.history.push('/login')
+            // 当前页面
+            this.setState({
+              isLogin: false,
+              userInfo: {}
+            })
+          }
+        }
+      },
+    ])
+  }
   render() {
     const { history } = this.props
+    const { userInfo, isLogin } = this.state;
 
     return (
       <div className={styles.root}>
@@ -37,14 +98,16 @@ export default class Profile extends Component {
             src={BASE_URL + '/img/profile/bg.png'}
             alt="背景图"
           />
+          {/* 用户信息 */}
           <div className={styles.info}>
             <div className={styles.myIcon}>
-              <img className={styles.avatar} src={DEFAULT_AVATAR} alt="icon" />
+              <img className={styles.avatar} src={userInfo.avatar || DEFAULT_AVATAR} alt="icon" />
             </div>
             <div className={styles.user}>
-              <div className={styles.name}>游客</div>
+              <div className={styles.name}>{userInfo.nickname ?? '游客'}</div>
               {/* 登录后展示： */}
-              {/* <>
+              {
+                isLogin && <>
                 <div className={styles.auth}>
                   <span onClick={this.logout}>退出</span>
                 </div>
@@ -56,10 +119,11 @@ export default class Profile extends Component {
                     <i className="iconfont icon-arrow" />
                   </span>
                 </div>
-              </> */}
+              </>}
 
               {/* 未登录展示： */}
-              <div className={styles.edit}>
+              {
+                !isLogin ? <div className={styles.edit}>
                 <Button
                   type="primary"
                   size="small"
@@ -68,7 +132,7 @@ export default class Profile extends Component {
                 >
                   去登录
                 </Button>
-              </div>
+              </div> : null}
             </div>
           </div>
         </div>
