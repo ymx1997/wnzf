@@ -26,3 +26,12 @@ export function getCityList(level=1) {
 export function getHotCity() {
     return api.get('/area/hot')
 }
+
+// 根据关键词和城市ID获取小区列表
+export function getCommunity(id,name) {
+    return api.get('/area/community',{
+        params:{
+            id,name
+        }
+    })
+}
