@@ -9,12 +9,15 @@ import {
   TextareaItem,
   Modal,
   NavBar,
-  Icon
+  Icon,
+  Toast
 } from 'antd-mobile'
 
 import HousePackage from '../../../components/HousePackage'
 
 import styles from './index.module.css'
+import { uploadImgs } from '../../../utils/api/House'
+import { pubHouse } from '../../../utils/api/user'
 
 const alert = Modal.alert
 
@@ -110,6 +113,65 @@ export default class RentAdd extends Component {
     })
   }
 
+  // 发布房源
+  addHouse = async () => {
+    // 先上传图片
+    // 获取本地图片的基本信息
+    const {
+      community,
+      price,
+      size,
+      roomType,
+      floor,
+      oriented,
+      description,
+      tempSlides,
+      title } = this.state;
+      // 获取房屋配套数据
+      let supporting = this.supporting;
+      // 边界处理（验证）
+      if(!title || !price || !size) {
+        return Toast.fail('房源信息不完整！')
+      }
+      // 服务器存储的图片地址
+      let serverImgs;
+    // if(tempSlides.length) {
+      // 上传到服务器=》获取服务器的图片存储路径
+      // 先处理本地图片的数据 => formdata
+      let fd = new FormData();
+      tempSlides.forEach((item) => fd.append('file', item.file))
+      let { status, data } = await uploadImgs(fd);
+      if (status === 200) {
+        serverImgs = data.join('|')
+      }
+    // }
+      // 处理表单其它数据
+      let postData = {
+        community: community.id,
+        price,
+        size,
+        roomType,
+        floor,
+        oriented,
+        description,
+        houseImg:serverImgs,
+        supporting,
+        title
+      }
+      // 调用接口发布房源
+      let res = await pubHouse(postData)
+      if(res.status === 200) {
+        Toast.success('发布成功！',1,()=>{
+          // 跳转到房源管理
+          this.props.history.push('/rent')
+        })
+      } else {
+        // token失效的情况 | 发布房源传递的数据不对
+        Toast.fail('发布失败！')
+      }
+
+  }
+
   render() {
     const Item = List.Item
     const { history } = this.props
@@ -190,6 +252,11 @@ export default class RentAdd extends Component {
           <ImagePicker
             files={tempSlides}
             multiple={true}
+            onChange={(files) => {
+              this.setState({
+                tempSlides: files
+              })
+            }}
             className={styles.imgpicker}
           />
         </List>
@@ -199,7 +266,9 @@ export default class RentAdd extends Component {
           renderHeader={() => '房屋配置'}
           data-role="rent-list"
         >
-          <HousePackage select />
+          <HousePackage select onSelect={(val) => {
+            this.supporting = val.join('|')
+          }} />
         </List>
 
         <List

@@ -39,3 +39,8 @@ export function removeFav(id) {
 export const getUserHouses = () => {
   return api.get('/user/houses')
 }
+
+// 发布房源
+export const pubHouse = (data) => {
+    return api.post('/user/houses', data)
+}
