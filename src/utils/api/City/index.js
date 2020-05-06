@@ -35,3 +35,20 @@ export function getCommunity(id,name) {
         }
     })
 }
+
+// 地图下钻查询房源信息
+// 多用
+/**
+ * 
+ * @param {*} id
+ * 1. 城市ID =》 获取当前城市区的数据
+ * 2. 区ID =》 获取当前区下街道的数据
+ * 3. 街道/镇ID =》 获取到小区的数据
+ */
+export function getMapHouse(id) {
+    return api.get('/area/map', {
+        params: {
+            id
+        }
+    })
+}
