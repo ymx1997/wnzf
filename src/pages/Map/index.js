@@ -6,8 +6,18 @@ import styles from './index.module.css'
 import { NavBar, Icon } from 'antd-mobile'
 import { getCurCity } from '../../utils/quanju'
 import { getMapHouse } from '../../utils/api/City'
+import { getListByFilter } from '../../utils/api/House'
+import HouseItem from '../../components/HouseItem'
+import { BASE_URL } from '../../utils/axios'
 
 class Map extends Component {
+
+    state = {
+        // 点击小区的房源列表数据
+        list: [],
+        // 控制列表是否显示
+        isShowList: false
+    }
 
     componentDidMount() {
         this.initMap()
@@ -42,6 +52,16 @@ class Map extends Component {
             }
         },
         label)
+
+        // 地图开始移动的时候触发
+        this.map.addEventListener('movestart', () => {
+            // 判断列表是否显示 => 显示 => 隐藏 => 不遮盖地图
+            if (this.state.isShowList) {
+                this.setState({
+                    isShowList: false
+                })
+            }
+        })
     }
 
     /**
@@ -115,7 +135,102 @@ class Map extends Component {
 
     // 创建方形覆盖物
     createRect = (item) => {
-        console.log('小区');
+        // 遍历渲染当前城市所有区的覆盖物到地图
+        const { coord: { longitude, latitude }, label: lab, count, value: val } = item;
+        // 转换经纬度 => 地图识别的坐标点
+        const ipoint = new this.BMap.Point(longitude, latitude)
+        // 创建文本覆盖物 （1个）
+        // 覆盖物参数
+        let opts = {
+            position : ipoint, // 指定文本标注所在的地理位置
+            offset : new this.BMap.Size(-50, -28) // 设置文本偏移量
+        }
+        // 初始化覆盖物实例
+        let label = new this.BMap.Label(null, opts); // 创建文本标注对象
+        // 使用html创建覆盖物
+        label.setContent(
+            `
+            <div class="${styles.rect}">
+            <span class="${styles.housename}">${lab}</span>
+            <span class="${styles.housenum}">${count}套</span>
+            <i class="${styles.arrow}"></i>
+            </div>`
+        )
+        // 设置覆盖物的样式
+        label.setStyle({
+            background: 'transparent',
+            border: 0
+        });
+        // 覆盖物添加点击事件
+        label.addEventListener('click', (e) => {
+            // 获取当前小区的房源列表
+            this.getHouseListById(val)
+            // 移动覆盖物到中心位置
+            this.moveToCenter(e)
+        })
+        // 调用百度地图的实例提供的addOverlay方法 =》添加覆盖物到地图
+        this.map.addOverlay(label);
+    }
+
+    // 点击某个小区 => 移动它到中心点位置
+    moveToCenter = (e) => {
+        // 计算中心点位置 => 终点
+        let zx = window.innerWidth / 2, zy = (window.innerHeight - 330) /2;
+        // 当前点击覆盖物到坐标点 =》 起点
+        let { clientX, clientY } = e.changedTouches[0]
+        // 计算当前点击到覆盖物 =》 移动到中心点坐标 (x,y)
+        // 中心点 = 终点 - 起点
+        this.map.panBy(zx - clientX, zy-clientY)
+    }
+
+    /**
+     * 根据小区ID获取当前小区的房源列表数据
+     */
+    getHouseListById = async (id) =>{
+        let { status, data: { list } } = await getListByFilter(id);
+        if (status === 200) {
+            this.setState({
+                list,
+                isShowList: true
+            })
+        }
+    }
+
+    // 渲染小区下房屋列表
+    renderHouseList = () => {
+        // 使用动画控制元素是否可见
+        return (
+            <div
+                className={[
+                    styles.houseList,
+                    this.state.isShowList ? styles.show : ''
+                ].join(' ')}
+            >
+                <div className={styles.titleWrap}>
+                    <h1 className={styles.listTitle}>房屋列表</h1>
+                    <a className={styles.titleMore} href="/home/house">
+                        更多房源
+                    </a>
+                </div>
+
+                <div className={styles.houseItems}>
+                    {/* 房屋结构 */}
+                    {
+                        this.state.list.map(item => (
+                            <HouseItem
+                                onClick={() => this.props.history.push(`/detail/${item.houseCode}`)}
+                                key={item.houseCode}
+                                src={BASE_URL + item.houseImg}
+                                title={item.title}
+                                desc={item.desc}
+                                tags={item.tags}
+                                price={item.price}
+                            />
+                        ))
+                    }
+                </div>
+            </div>
+        )
     }
 
     // 获取当前的覆盖物形状和下一层缩放级别
@@ -148,6 +263,10 @@ class Map extends Component {
                 >地图找房</NavBar>
                 {/* 地图 */}
                 <div id="container"></div>
+                {/* 点击小区后 =》 展现 =》 当前小区的房源列表 */}
+                {
+                    this.renderHouseList()
+                }
             </div>
         )
     }
